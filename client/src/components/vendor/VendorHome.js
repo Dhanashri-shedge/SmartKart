@@ -24,6 +24,7 @@ import {
   Error
 } from '@mui/icons-material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const VendorHome = () => {
   const [stats, setStats] = useState({
@@ -33,6 +34,8 @@ const VendorHome = () => {
     pendingPayments: 0,
     recentOrders: []
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -187,6 +190,7 @@ const VendorHome = () => {
                   variant="contained"
                   startIcon={<Group />}
                   fullWidth
+                  onClick={() => navigate('/vendor/groups')}
                 >
                   Create Bulk Order Group
                 </Button>
