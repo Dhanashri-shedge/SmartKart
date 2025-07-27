@@ -13,13 +13,25 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*", // allow all origins in production or configure with Render frontend URL
-    methods: ["GET", "POST"]
+    origin: "https://smartkart-ww3p.onrender.com", // ✅ Your frontend URL
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
+// ✅ Allowed origins
+const allowedOrigins = ['https://smartkart-ww3p.onrender.com'];
+
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -56,16 +68,14 @@ io.on('connection', (socket) => {
 
 app.set('io', io);
 
-// ===  Serve static React files ===
+// === Serve static React files ===
 const __dirnameFull = path.resolve();
-app.use(express.static(path.join(__dirname, 'client_build')));
-
+app.use(express.static(path.join(__dirnameFull, 'client_build')));
 
 // Fallback route to React index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client_build', 'index.html'));
+  res.sendFile(path.join(__dirnameFull, 'client_build', 'index.html'));
 });
-
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -78,3 +88,4 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+ 
