@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+// ✅ Set the correct base URL for production
+axios.defaults.baseURL = "https://smartkart-ww3p.onrender.com/api";
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -24,7 +27,7 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const response = await axios.get('/api/auth/profile');
+        const response = await axios.get('/auth/profile');
         setUser(response.data.user);
       }
     } catch (error) {
@@ -38,38 +41,38 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await axios.post('/auth/login', { email, password });
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
-      
+
       return { success: true, user };
     } catch (error) {
       console.error('Login failed:', error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Login failed'
       };
     }
   };
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/register', userData);
+      const response = await axios.post('/auth/register', userData);
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
-      
+
       return { success: true, user };
     } catch (error) {
       console.error('Registration failed:', error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Registration failed' 
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Registration failed'
       };
     }
   };
@@ -94,4 +97,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-}; 
+};
