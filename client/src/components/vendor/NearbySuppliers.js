@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import 'leaflet/dist/leaflet.css';
+
 import {
   Box,
   Typography,
