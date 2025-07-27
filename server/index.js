@@ -10,12 +10,10 @@ const socketIo = require('socket.io');
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
 
-// ✅ Allowed frontend origin
+// ✅ CORS configuration must come before everything
 const allowedOrigin = 'https://smartkart-ww3p.onrender.com';
 
-// ✅ CORS configuration
 const corsOptions = {
   origin: allowedOrigin,
   credentials: true,
@@ -24,16 +22,19 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight
-
-// ✅ Socket.IO setup with CORS
-const io = socketIo(server, {
-  cors: corsOptions,
-});
+app.options('*', cors(corsOptions)); // Preflight support
 
 // ✅ Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ✅ Create HTTP server *after* CORS setup
+const server = http.createServer(app);
+
+// ✅ Socket.IO with proper CORS
+const io = socketIo(server, {
+  cors: corsOptions,
+});
 
 // ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/smartkart', {
@@ -52,7 +53,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/dev', require('./routes/dev-orders'));
 app.use('/api/dev', require('./routes/dev'));
 
-// ✅ Socket.io events
+// ✅ Socket.IO events
 io.on('connection', (socket) => {
   console.log('🔌 User connected:', socket.id);
 
@@ -68,7 +69,7 @@ io.on('connection', (socket) => {
 
 app.set('io', io);
 
-// ✅ Serve React frontend build
+// ✅ Serve frontend build
 const __dirnameFull = path.resolve();
 app.use(express.static(path.join(__dirnameFull, 'client_build')));
 
@@ -77,7 +78,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirnameFull, 'client_build', 'index.html'));
 });
 
-// ✅ Error handling middleware
+// ✅ Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
