@@ -58,12 +58,14 @@ app.set('io', io);
 
 // ===  Serve static React files ===
 const __dirnameFull = path.resolve();
-app.use(express.static(path.join(__dirnameFull, 'client/build')));
+app.use(express.static(path.join(__dirname, 'client_build')));
+
 
 // Fallback route to React index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirnameFull, 'client/build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'client_build', 'index.html'));
 });
+
 
 // Global error handler
 app.use((err, req, res, next) => {
