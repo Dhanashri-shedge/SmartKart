@@ -95,7 +95,7 @@ const Register = () => {
       const result = await register(userData);
       if (result.success) {
         if (result.user.userType === 'vendor') {
-          navigate('/vendor');
+          navigate('/home');
         } else {
           navigate('/supplier');
         }

@@ -8,6 +8,12 @@ import Register from './components/auth/Register';
 import VendorDashboard from './components/vendor/VendorDashboard';
 import SupplierDashboard from './components/supplier/SupplierDashboard';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AboutPage from './components/AboutPage';
+import ContactPage from './components/ContactPage';
+import CustomNavbar from './components/CustomNavbar';
+import GroupForm from './components/GroupForm';
+import HomePage from './components/HomePage';
+import OrderForm from './components/OrderForm'; 
 import axios from 'axios';
 
 // Set default axios base URL
@@ -45,6 +51,12 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/about" element = {<AboutPage/>} />
+            <Route path="/contact" element = {<ContactPage/>} />
+            <Route path="/navbar" element = {<CustomNavbar/>} />
+            <Route path="/Group" element = {<GroupForm/>} />
+            <Route path="/home" element = {<HomePage/>} />
+            <Route path="/order" element = {<OrderForm/>} />
             <Route
               path="/vendor/*"
               element={

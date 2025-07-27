@@ -15,7 +15,7 @@ import {
   TableRow,
   Paper
 } from '@mui/material';
-import { History, TrendingUp } from '@mui/icons-material';
+import { TrendingUp } from '@mui/icons-material';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -24,13 +24,48 @@ const OrderHistory = () => {
     fetchOrders();
   }, []);
 
+  const demoOrders = [
+    {
+      _id: 'demo001',
+      vendorId: { businessName: 'Sharma Foods' },
+      items: [{ name: 'Rice' }, { name: 'Wheat' }],
+      totalAmount: 1200,
+      status: 'delivered',
+      deliveryDate: '2025-07-25',
+    },
+    {
+      _id: 'demo002',
+      vendorId: { businessName: 'Patel Groceries' },
+      items: [{ name: 'Oil' }],
+      totalAmount: 700,
+      status: 'accepted',
+      deliveryDate: '2025-07-24',
+    },
+    {
+      _id: 'demo003',
+      vendorId: { name: 'Kiran Traders' },
+      items: [{ name: 'Sugar' }, { name: 'Salt' }],
+      totalAmount: 450,
+      status: 'pending',
+      deliveryDate: '2025-07-23',
+    },
+  ];
+
   const fetchOrders = async () => {
     try {
-      const res = await fetch('/api/orders', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+      const res = await fetch('/api/orders', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
       const data = await res.json();
-      setOrders(data.orders || []);
+      if (data.orders?.length > 0) {
+        setOrders(data.orders);
+      } else {
+        setOrders(demoOrders);
+      }
     } catch (err) {
-      setOrders([]);
+      setOrders(demoOrders);
     }
   };
 
@@ -109,14 +144,12 @@ const OrderHistory = () => {
       <Card>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">
-              Recent Orders
-            </Typography>
+            <Typography variant="h6">Recent Orders</Typography>
             <Button variant="outlined" startIcon={<TrendingUp />}>
               Export Data
             </Button>
           </Box>
-          
+
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -131,23 +164,23 @@ const OrderHistory = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-          {orders.map((order) => (
-            <TableRow key={order._id}>
-              <TableCell>#{order._id.slice(-6)}</TableCell>
-              <TableCell>{order.vendorId?.businessName || order.vendorId?.name || 'Unknown'}</TableCell>
-              <TableCell>{order.items?.map(i => i.name).join(', ')}</TableCell>
-              <TableCell>₹{order.totalAmount?.toLocaleString()}</TableCell>
-              <TableCell>
-                <Chip label={order.status} color={getStatusColor(order.status)} size="small" />
-              </TableCell>
-              <TableCell>{new Date(order.deliveryDate).toLocaleDateString()}</TableCell>
-              <TableCell>
-                <Button size="small" variant="outlined">
-                  View Details
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+                {orders.map((order) => (
+                  <TableRow key={order._id}>
+                    <TableCell>#{order._id.slice(-6)}</TableCell>
+                    <TableCell>{order.vendorId?.businessName || order.vendorId?.name || 'Unknown'}</TableCell>
+                    <TableCell>{order.items?.map(i => i.name).join(', ')}</TableCell>
+                    <TableCell>₹{order.totalAmount?.toLocaleString()}</TableCell>
+                    <TableCell>
+                      <Chip label={order.status} color={getStatusColor(order.status)} size="small" />
+                    </TableCell>
+                    <TableCell>{new Date(order.deliveryDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Button size="small" variant="outlined">
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -157,4 +190,4 @@ const OrderHistory = () => {
   );
 };
 
-export default OrderHistory; 
+export default OrderHistory;

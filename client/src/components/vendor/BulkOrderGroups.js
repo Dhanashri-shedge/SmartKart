@@ -30,7 +30,7 @@ const BulkOrderGroups = () => {
         <Button
           variant="contained"
           startIcon={<Add />}
-          onClick={() => navigate('/vendor/groups/create')}
+          onClick={() => navigate('/Group')}
         >
           Create New Group
         </Button>
@@ -51,7 +51,7 @@ const BulkOrderGroups = () => {
               </Typography>
               <Button variant="outlined" fullWidth
               startIcon={<Add />}
-              onClick={() => navigate('/vendor/groups/create')}>
+              onClick={() => navigate('/Group')}>
                 Start Creating Group
               </Button>
             </CardContent>

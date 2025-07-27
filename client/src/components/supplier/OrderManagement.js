@@ -21,14 +21,47 @@ const OrderManagement = () => {
     fetchOrders();
   }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await fetch('/api/orders?status=pending', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-      const data = await res.json();
-      setOrders(data.orders || []);
-    } catch (err) {
-      setOrders([]);
-    }
+  const fetchOrders = () => {
+    // Demo orders for frontend preview
+    const demo = [
+      {
+        _id: '64ab12cdef001',
+        vendorId: { businessName: 'Fresh Farms' },
+        totalAmount: 1450,
+        items: [{ name: 'Tomatoes' }, { name: 'Onions' }],
+        status: 'pending'
+      },
+      {
+        _id: '64ab12cdef002',
+        vendorId: { name: 'Spice Mart' },
+        totalAmount: 3200,
+        items: [{ name: 'Turmeric' }, { name: 'Chili Powder' }],
+        status: 'accepted'
+      },
+      {
+        _id: '64ab12cdef003',
+        vendorId: { businessName: 'Organic World' },
+        totalAmount: 5000,
+        items: [{ name: 'Rice' }, { name: 'Wheat' }],
+        status: 'delivered'
+      },
+      {
+        _id: '64ab12cdef004',
+        vendorId: { name: 'Green Basket' },
+        totalAmount: 900,
+        items: [{ name: 'Carrots' }],
+        status: 'rejected'
+      }
+    ];
+    setOrders(demo);
+  };
+
+  const updateOrderStatus = (id, newStatus) => {
+    setOrders(prev =>
+      prev.map(order =>
+        order._id === id ? { ...order, status: newStatus } : order
+      )
+    );
   };
 
   return (
@@ -42,7 +75,7 @@ const OrderManagement = () => {
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="primary">
-                12
+                {orders.filter(o => o.status === 'pending').length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Pending Orders
@@ -54,7 +87,7 @@ const OrderManagement = () => {
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="success.main">
-                45
+                {orders.filter(o => o.status === 'accepted').length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Accepted Orders
@@ -66,7 +99,7 @@ const OrderManagement = () => {
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="info.main">
-                38
+                {orders.filter(o => o.status === 'delivered').length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Delivered Orders
@@ -78,7 +111,7 @@ const OrderManagement = () => {
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="error">
-                3
+                {orders.filter(o => o.status === 'rejected').length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Rejected Orders
@@ -97,7 +130,15 @@ const OrderManagement = () => {
             {orders.map((order) => (
               <ListItem key={order._id} divider>
                 <ListItemIcon>
-                  {order.status === 'pending' ? <Pending color="warning" /> : order.status === 'accepted' ? <CheckCircle color="success" /> : order.status === 'delivered' ? <CheckCircle color="info" /> : <Cancel color="error" />}
+                  {order.status === 'pending' ? (
+                    <Pending color="warning" />
+                  ) : order.status === 'accepted' ? (
+                    <CheckCircle color="success" />
+                  ) : order.status === 'delivered' ? (
+                    <CheckCircle color="info" />
+                  ) : (
+                    <Cancel color="error" />
+                  )}
                 </ListItemIcon>
                 <ListItemText
                   primary={`Order #${order._id.slice(-6)} from ${order.vendorId?.businessName || order.vendorId?.name || 'Unknown'}`}
@@ -105,29 +146,35 @@ const OrderManagement = () => {
                 />
                 {order.status === 'pending' ? (
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button variant="contained" size="small" color="success" onClick={async () => {
-                      await fetch(`/api/orders/${order._id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                        body: JSON.stringify({ status: 'accepted' })
-                      });
-                      fetchOrders();
-                    }}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="success"
+                      onClick={() => updateOrderStatus(order._id, 'accepted')}
+                    >
                       Accept
                     </Button>
-                    <Button variant="outlined" size="small" color="error" onClick={async () => {
-                      await fetch(`/api/orders/${order._id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                        body: JSON.stringify({ status: 'rejected' })
-                      });
-                      fetchOrders();
-                    }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="error"
+                      onClick={() => updateOrderStatus(order._id, 'rejected')}
+                    >
                       Reject
                     </Button>
                   </Box>
                 ) : (
-                  <Chip label={order.status} color={order.status === 'accepted' ? 'success' : order.status === 'delivered' ? 'info' : 'error'} size="small" />
+                  <Chip
+                    label={order.status}
+                    color={
+                      order.status === 'accepted'
+                        ? 'success'
+                        : order.status === 'delivered'
+                        ? 'info'
+                        : 'error'
+                    }
+                    size="small"
+                  />
                 )}
               </ListItem>
             ))}
@@ -138,4 +185,4 @@ const OrderManagement = () => {
   );
 };
 
-export default OrderManagement; 
+export default OrderManagement;
