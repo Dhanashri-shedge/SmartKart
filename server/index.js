@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -55,6 +56,11 @@ io.on('connection', (socket) => {
 
 // Make io accessible to routes
 app.set('io', io);
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
