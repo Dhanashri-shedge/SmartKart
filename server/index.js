@@ -12,18 +12,10 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+// ✅ Allowed frontend origin
 const allowedOrigin = 'https://smartkart-ww3p.onrender.com';
 
-// ✅ Socket.IO setup with CORS
-const io = socketIo(server, {
-  cors: {
-    origin: allowedOrigin,
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
-
-// ✅ CORS middleware
+// ✅ CORS configuration
 const corsOptions = {
   origin: allowedOrigin,
   credentials: true,
@@ -32,18 +24,14 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight
 
-// ✅ Add custom headers manually for safety
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', allowedOrigin);
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  next();
+// ✅ Socket.IO setup with CORS
+const io = socketIo(server, {
+  cors: corsOptions,
 });
 
-// JSON parsing
+// ✅ Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -55,7 +43,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/smartkart
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ✅ API Routes
+// ✅ Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/vendors', require('./routes/vendors'));
 app.use('/api/suppliers', require('./routes/suppliers'));
@@ -80,7 +68,7 @@ io.on('connection', (socket) => {
 
 app.set('io', io);
 
-// ✅ Serve React static files
+// ✅ Serve React frontend build
 const __dirnameFull = path.resolve();
 app.use(express.static(path.join(__dirnameFull, 'client_build')));
 
@@ -89,13 +77,13 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirnameFull, 'client_build', 'index.html'));
 });
 
-// ✅ Global error handler
+// ✅ Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// ✅ Start the server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
