@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -15,6 +15,22 @@ import {
 import { ShoppingCart, CheckCircle, Cancel, Pending } from '@mui/icons-material';
 
 const OrderManagement = () => {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch('/api/orders?status=pending', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+      const data = await res.json();
+      setOrders(data.orders || []);
+    } catch (err) {
+      setOrders([]);
+    }
+  };
+
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
@@ -78,43 +94,43 @@ const OrderManagement = () => {
             Recent Orders
           </Typography>
           <List>
-            <ListItem divider>
-              <ListItemIcon>
-                <Pending color="warning" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Order #123456 from ABC Grocery"
-                secondary="₹15,000 - Vegetables & Fruits - Pending"
-              />
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button variant="contained" size="small" color="success">
-                  Accept
-                </Button>
-                <Button variant="outlined" size="small" color="error">
-                  Reject
-                </Button>
-              </Box>
-            </ListItem>
-            <ListItem divider>
-              <ListItemIcon>
-                <CheckCircle color="success" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Order #123455 from XYZ Restaurant"
-                secondary="₹8,500 - Grains & Spices - Accepted"
-              />
-              <Chip label="Accepted" color="success" size="small" />
-            </ListItem>
-            <ListItem divider>
-              <ListItemIcon>
-                <CheckCircle color="info" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Order #123454 from Fresh Market"
-                secondary="₹12,000 - Dairy Products - Delivered"
-              />
-              <Chip label="Delivered" color="info" size="small" />
-            </ListItem>
+            {orders.map((order) => (
+              <ListItem key={order._id} divider>
+                <ListItemIcon>
+                  {order.status === 'pending' ? <Pending color="warning" /> : order.status === 'accepted' ? <CheckCircle color="success" /> : order.status === 'delivered' ? <CheckCircle color="info" /> : <Cancel color="error" />}
+                </ListItemIcon>
+                <ListItemText
+                  primary={`Order #${order._id.slice(-6)} from ${order.vendorId?.businessName || order.vendorId?.name || 'Unknown'}`}
+                  secondary={`₹${order.totalAmount?.toLocaleString()} - ${order.items?.map(i => i.name).join(', ')} - ${order.status}`}
+                />
+                {order.status === 'pending' ? (
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button variant="contained" size="small" color="success" onClick={async () => {
+                      await fetch(`/api/orders/${order._id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        body: JSON.stringify({ status: 'accepted' })
+                      });
+                      fetchOrders();
+                    }}>
+                      Accept
+                    </Button>
+                    <Button variant="outlined" size="small" color="error" onClick={async () => {
+                      await fetch(`/api/orders/${order._id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        body: JSON.stringify({ status: 'rejected' })
+                      });
+                      fetchOrders();
+                    }}>
+                      Reject
+                    </Button>
+                  </Box>
+                ) : (
+                  <Chip label={order.status} color={order.status === 'accepted' ? 'success' : order.status === 'delivered' ? 'info' : 'error'} size="small" />
+                )}
+              </ListItem>
+            ))}
           </List>
         </CardContent>
       </Card>

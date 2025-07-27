@@ -36,6 +36,8 @@ app.use('/api/vendors', require('./routes/vendors'));
 app.use('/api/suppliers', require('./routes/suppliers'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/dev', require('./routes/dev-orders'));
+app.use('/api/dev', require('./routes/dev'));
 
 // Socket.io connection handling
 io.on('connection', (socket) => {

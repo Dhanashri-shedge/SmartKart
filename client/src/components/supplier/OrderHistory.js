@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -18,40 +18,21 @@ import {
 import { History, TrendingUp } from '@mui/icons-material';
 
 const OrderHistory = () => {
-  const mockOrders = [
-    {
-      id: '123456',
-      vendor: 'ABC Grocery',
-      amount: 15000,
-      status: 'delivered',
-      date: '2024-01-15',
-      items: 'Vegetables & Fruits'
-    },
-    {
-      id: '123455',
-      vendor: 'XYZ Restaurant',
-      amount: 8500,
-      status: 'accepted',
-      date: '2024-01-14',
-      items: 'Grains & Spices'
-    },
-    {
-      id: '123454',
-      vendor: 'Fresh Market',
-      amount: 12000,
-      status: 'delivered',
-      date: '2024-01-13',
-      items: 'Dairy Products'
-    },
-    {
-      id: '123453',
-      vendor: 'City Foods',
-      amount: 9500,
-      status: 'rejected',
-      date: '2024-01-12',
-      items: 'Meat & Poultry'
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch('/api/orders', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+      const data = await res.json();
+      setOrders(data.orders || []);
+    } catch (err) {
+      setOrders([]);
     }
-  ];
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -150,27 +131,23 @@ const OrderHistory = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {mockOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>#{order.id}</TableCell>
-                    <TableCell>{order.vendor}</TableCell>
-                    <TableCell>{order.items}</TableCell>
-                    <TableCell>₹{order.amount.toLocaleString()}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={order.status}
-                        color={getStatusColor(order.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>{order.date}</TableCell>
-                    <TableCell>
-                      <Button size="small" variant="outlined">
-                        View Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+          {orders.map((order) => (
+            <TableRow key={order._id}>
+              <TableCell>#{order._id.slice(-6)}</TableCell>
+              <TableCell>{order.vendorId?.businessName || order.vendorId?.name || 'Unknown'}</TableCell>
+              <TableCell>{order.items?.map(i => i.name).join(', ')}</TableCell>
+              <TableCell>₹{order.totalAmount?.toLocaleString()}</TableCell>
+              <TableCell>
+                <Chip label={order.status} color={getStatusColor(order.status)} size="small" />
+              </TableCell>
+              <TableCell>{new Date(order.deliveryDate).toLocaleDateString()}</TableCell>
+              <TableCell>
+                <Button size="small" variant="outlined">
+                  View Details
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
               </TableBody>
             </Table>
           </TableContainer>

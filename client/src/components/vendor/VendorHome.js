@@ -198,6 +198,7 @@ const VendorHome = () => {
                   variant="outlined"
                   startIcon={<Payment />}
                   fullWidth
+                  onClick={() => navigate('/vendor/payments')}
                 >
                   Make UPI Payment
                 </Button>
@@ -205,6 +206,7 @@ const VendorHome = () => {
                   variant="outlined"
                   startIcon={<Schedule />}
                   fullWidth
+                  onClick={() => navigate('/vendor/delivery')}
                 >
                   Schedule Delivery
                 </Button>
@@ -212,6 +214,7 @@ const VendorHome = () => {
                   variant="outlined"
                   startIcon={<TrendingUp />}
                   fullWidth
+                  onClick={() => navigate('/vendor/material-prediction')}
                 >
                   View Material Prediction
                 </Button>

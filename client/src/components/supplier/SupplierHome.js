@@ -103,10 +103,28 @@ const SupplierHome = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Supplier Dashboard
-      </Typography>
-      
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4" gutterBottom>
+          Supplier Dashboard
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            startIcon={<Notifications />}
+            onClick={() => window.location.pathname = '/supplier/notifications'}
+          >
+            Notifications
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<CheckCircle />}
+            onClick={() => window.location.pathname = '/supplier/profile'}
+          >
+            Profile
+          </Button>
+        </Box>
+      </Box>
+
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
@@ -117,7 +135,6 @@ const SupplierHome = () => {
             subtitle="This month"
           />
         </Grid>
-        
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Pending Orders"
@@ -127,7 +144,6 @@ const SupplierHome = () => {
             subtitle="Awaiting action"
           />
         </Grid>
-        
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Completed"
@@ -137,7 +153,6 @@ const SupplierHome = () => {
             subtitle="Successfully delivered"
           />
         </Grid>
-        
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Revenue"
@@ -197,6 +212,7 @@ const SupplierHome = () => {
                   variant="contained"
                   startIcon={<ShoppingCart />}
                   fullWidth
+                  onClick={() => window.location.pathname = '/supplier/orders'}
                 >
                   View Pending Orders
                 </Button>
@@ -204,6 +220,7 @@ const SupplierHome = () => {
                   variant="outlined"
                   startIcon={<CheckCircle />}
                   fullWidth
+                  onClick={() => window.location.pathname = '/supplier/orders'}
                 >
                   Update Order Status
                 </Button>
@@ -211,6 +228,7 @@ const SupplierHome = () => {
                   variant="outlined"
                   startIcon={<TrendingUp />}
                   fullWidth
+                  onClick={() => window.location.pathname = '/supplier/history'}
                 >
                   View Order History
                 </Button>
@@ -218,8 +236,17 @@ const SupplierHome = () => {
                   variant="outlined"
                   startIcon={<Notifications />}
                   fullWidth
+                  onClick={() => window.location.pathname = '/supplier/notifications'}
                 >
                   Manage Notifications
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<CheckCircle />}
+                  fullWidth
+                  onClick={() => window.location.pathname = '/supplier/profile'}
+                >
+                  Profile
                 </Button>
               </Box>
             </CardContent>

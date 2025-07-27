@@ -45,6 +45,7 @@ const VendorDashboard = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, logout } = useAuth();
   const { notifications } = useSocket();
+  const navigate = require('react-router-dom').useNavigate();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -57,6 +58,15 @@ const VendorDashboard = () => {
   const handleLogout = () => {
     logout();
     handleMenuClose();
+  };
+
+  const handleProfile = () => {
+    navigate('/vendor/profile');
+    handleMenuClose();
+  };
+
+  const handleNotifications = () => {
+    navigate('/vendor/notifications');
   };
 
   const menuItems = [
@@ -87,12 +97,11 @@ const VendorDashboard = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <IconButton color="inherit">
+            <IconButton color="inherit" onClick={handleNotifications}>
               <Badge badgeContent={notifications.length} color="error">
                 <Notifications />
               </Badge>
             </IconButton>
-            
             <Button
               color="inherit"
               onClick={handleMenuOpen}
@@ -100,13 +109,12 @@ const VendorDashboard = () => {
             >
               {user?.name}
             </Button>
-            
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
-              <MenuItem onClick={handleMenuClose}>
+              <MenuItem onClick={handleProfile}>
                 <AccountCircle sx={{ mr: 1 }} />
                 Profile
               </MenuItem>
@@ -138,7 +146,10 @@ const VendorDashboard = () => {
             <ListItem
               button
               key={item.text}
-              onClick={() => setDrawerOpen(false)}
+              onClick={() => {
+                setDrawerOpen(false);
+                navigate(item.path);
+              }}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
